@@ -82,6 +82,10 @@
   cursor: pointer;
 }
 
+#loginbutton:hover {
+  filter: brightness(1.1);
+}
+
 #rusignupmessage {
   font-size: 20px;
 }

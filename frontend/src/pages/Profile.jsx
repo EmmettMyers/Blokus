@@ -96,17 +96,19 @@ function Profile() {
         </div>
       </div>
       <div id="profilebuttonscontainer">
-        <div
+        <button
           id="editprofilebutton"
           onClick={editMode ? handleSave : handleEdit}
         >
           {editMode ? "Save" : "Edit"}
-        </div>
-        <div id="logoutbutton" onClick={handleSignOut}>
+        </button>
+        <button id="logoutbutton" onClick={handleSignOut}>
           Log Out
-        </div>
+        </button>
       </div>
-      <button id="cpbutton" onClick={handleResetPassword}>Change Password</button>
+      <button id="cpbutton" onClick={handleResetPassword}>
+        Change Password
+      </button>
       <p>{message}</p>
     </div>
   );

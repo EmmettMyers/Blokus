@@ -75,13 +75,16 @@
   height: 60px;
   width: 120px;
   margin-top: 40px;
-  border-width: 5px;
   color: white;
   text-decoration: none;
   font-family: "Jockey One";
   font-size: 30px;
   text-shadow: -2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black,
     2px 2px 0 black;
+}
+
+#signupbutton:hover {
+  filter: brightness(1.1);
 }
 
 #suloginmessage {
