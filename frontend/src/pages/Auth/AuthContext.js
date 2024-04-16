@@ -9,16 +9,13 @@ export function useAuth() {
 
 export function AuthProvider(props) {
   const [authUser, setAuthUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     // Subscribe to Firebase authentication state changes
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        setIsLoggedIn(true);
         setAuthUser(user);
       } else {
-        setIsLoggedIn(false);
         setAuthUser(null);
       }
     });
@@ -30,8 +27,6 @@ export function AuthProvider(props) {
   const value = {
     authUser,
     setAuthUser,
-    isLoggedIn,
-    setIsLoggedIn,
   };
 
   return (

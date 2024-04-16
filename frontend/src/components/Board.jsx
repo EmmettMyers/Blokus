@@ -11,10 +11,28 @@ import { flip_piece, pieces } from "../gameLogic/pieceData";
 import { rotate_piece } from "../gameLogic/pieceData";
 import { useTimer } from "react-timer-hook";
 import { bot_play_piece } from "../gameLogic/bot";
-import { bots_playing, currentPlayerTurnIndex, end_turn } from "../gameLogic/playerData";
-import { join_game, lobby_code, piece_played, player_id, socket, start_game } from "../gameLogic/lobbies";
+import {
+  bots_playing,
+  currentPlayerTurnIndex,
+  end_turn,
+} from "../gameLogic/playerData";
+import {
+  join_game,
+  lobby_code,
+  piece_played,
+  player_id,
+  socket,
+  start_game,
+} from "../gameLogic/lobbies";
 
-function Board({ playerNames, pieceIndex, myPlayer, expiryTimestamp, endRound, onlineGame }) {
+function Board({
+  playerNames,
+  pieceIndex,
+  myPlayer,
+  expiryTimestamp,
+  endRound,
+  onlineGame,
+}) {
   const [board, setBoard] = useState([[]]);
   const [displayRows, setDisplayRows] = useState([]);
   const [hoverRow, setHoverRow] = useState(-1);
@@ -48,15 +66,15 @@ function Board({ playerNames, pieceIndex, myPlayer, expiryTimestamp, endRound, o
   });
 
   const startGame = () => {
-    var playersChosen = playerNames.every(item => !item.includes('c'));
-    if (playersChosen){
-      if (onlineGame){
+    var playersChosen = playerNames.every((item) => !item.includes("c"));
+    if (playersChosen) {
+      if (onlineGame) {
         start_game(lobby_code);
       }
       setGameStarted(true);
       resume();
     }
-  }
+  };
 
   // tracks if game was started by another user
   /*socket.on('game_started', ( data ) => {
@@ -68,7 +86,7 @@ function Board({ playerNames, pieceIndex, myPlayer, expiryTimestamp, endRound, o
 
   // creates a 20x20 grid of block components based on board 2d matrix
   const fillBoard = () => {
-    console.log("in fill board")
+    console.log("in fill board");
     let boardComponents = board.map((row, rowIndex) => (
       <div className="row" key={rowIndex}>
         {row.map((cell, colIndex) => (
@@ -115,7 +133,7 @@ function Board({ playerNames, pieceIndex, myPlayer, expiryTimestamp, endRound, o
   const placePlayerPiece = (row, col) => {
     if (board[row][col] == "highlight" || board[row][col] == "pointer") {
       play_piece(row, col, myPlayer, pieceIndex);
-      if (onlineGame){
+      if (onlineGame) {
         piece_played(lobby_code, board_matrix);
       }
       setBoard(board_matrix);
@@ -133,16 +151,16 @@ function Board({ playerNames, pieceIndex, myPlayer, expiryTimestamp, endRound, o
 
   const playBotRound = (difficulty) => {
     bot_play_piece(myPlayer, difficulty);
-    if (onlineGame){
+    if (onlineGame) {
       piece_played(lobby_code, board_matrix);
     }
     setBoard(board_matrix);
     fillBoard();
     endRound();
-  }
+  };
 
   const setBoardHighlights = (row, col) => {
-    if (gameStarted){
+    if (gameStarted) {
       removeHighlightsFromBoard();
       const piece = pieces[pieceIndex];
       if (
@@ -191,7 +209,7 @@ function Board({ playerNames, pieceIndex, myPlayer, expiryTimestamp, endRound, o
   useEffect(() => {
     if (seconds == 0) {
       play_random_piece(myPlayer);
-      if (onlineGame){
+      if (onlineGame) {
         piece_played(lobby_code, board_matrix);
       }
       // delay to render piece
@@ -237,7 +255,7 @@ function Board({ playerNames, pieceIndex, myPlayer, expiryTimestamp, endRound, o
 
   useEffect(() => {
     var bot = bots_playing[currentPlayerTurnIndex];
-    if (bot != ''){
+    if (bot != "") {
       playBotRound(bot);
     }
   }, [myPlayer]);
@@ -258,18 +276,16 @@ function Board({ playerNames, pieceIndex, myPlayer, expiryTimestamp, endRound, o
       <div id="board">{displayRows}</div>
 
       <div id="timerHolder">
-        {
-          gameStarted ?
-            <div id="playerTimer" className={seconds <= 10 ? "redBorder" : ""}>
-              {seconds}
-            </div>
-          :
-            <div id="startBtn" onClick={() => startGame()}>
-              Start Game
-            </div>
-        }
+        {gameStarted ? (
+          <div id="playerTimer" className={seconds <= 10 ? "redBorder" : ""}>
+            {seconds}
+          </div>
+        ) : (
+          <div id="startBtn" onClick={() => startGame()}>
+            Start Game
+          </div>
+        )}
       </div>
-
     </>
   );
 }

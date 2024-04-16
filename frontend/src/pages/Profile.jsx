@@ -1,7 +1,8 @@
 import "./Profile.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProfileIcon from "../assets/ProfileIcon.svg";
-import { auth } from "../firebase";
+import database, { auth } from "../firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import {
   signOut,
   sendPasswordResetEmail,
@@ -11,11 +12,13 @@ import {
 import { useAuth } from "./Auth/AuthContext";
 
 function Profile() {
-  const { authUser, setIsLoggedIn, setAuthUser } = useAuth();
-  const [nickname, setNickname] = useState("TODO");
-  const [email, setEmail] = useState(authUser.email);
-  const [newEmail, setNewEmail] = useState("");
+  const { authUser, setAuthUser } = useAuth();
+  const [userData, setUserData] = useState("");
+  const [nickname, setNickname] = useState("Loading ...");
+  const [email, setEmail] = useState("Loading ...");
   const [editMode, setEditMode] = useState(false);
+  const [isNicknameDirty, setIsNicknameDirty] = useState(false);
+  const [isEmailDirty, setIsEmailDirty] = useState(false);
   const [message, setMessage] = useState("");
 
   const handleResetPassword = async () => {
@@ -27,13 +30,48 @@ function Profile() {
     }
   };
 
+  const handleEdit = () => {
+    setEditMode(true);
+  };
+
+  const handleNicknameChange = (e) => {
+    setNickname(e.target.value);
+    setIsNicknameDirty(true);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    setIsEmailDirty(true);
+  };
+
   const handleSave = async () => {
     try {
-      await updateEmail(authUser, newEmail);
-      await sendEmailVerification(authUser);
-      console.log("Hello?");
-      setMessage("Email address updated successfully.");
-      setEmail(newEmail);
+      // only update the email if the user has changed something
+      if (isEmailDirty) {
+        await updateEmail(authUser, email);
+        await sendEmailVerification(authUser);
+        console.log("Hello?");
+        setMessage("Email address updated successfully.");
+        setEmail(email);
+      }
+
+      // only update the nickname if the user has changed something
+      if (isNicknameDirty) {
+        // identify the user info we want to change
+        const docRef = doc(database, "users", authUser.uid);
+        // set the fields we want to change
+        const payload = {
+          nickname: nickname,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImage: userData.profileImage,
+          gamesPlayed: userData.gamesPlayed,
+          gamesWon: userData.gamesWon,
+          totalPieces: userData.totalPieces,
+        };
+        // actually update in the database
+        setDoc(docRef, payload);
+      }
       setEditMode(false);
     } catch (error) {
       setMessage(error.message);
@@ -44,17 +82,39 @@ function Profile() {
     signOut(auth)
       .then(() => {
         setAuthUser(null);
-        setIsLoggedIn(false);
         console.log("signout successful");
         window.location.href = "/";
       })
       .catch((error) => console.log(error));
   };
 
-  const handleEdit = () => {
-    setEditMode(true);
-    console.log("hello");
-  };
+  // get all the firestore info for the current logged in user
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const userDocRef = doc(database, "users", authUser.uid);
+        const userDocSnapshot = await getDoc(userDocRef);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          console.log(userData);
+          setUserData(userData);
+          // get the nickname from firestore and set it in the frontend state
+          setNickname(userData.nickname);
+
+          // get the email from firebase auth and set it in the frontend state
+          setEmail(authUser.email);
+        } else {
+          console.log("User document does not exist");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    if (authUser) {
+      getUserData();
+    }
+  }, [authUser]);
 
   return (
     <div id="profile">
@@ -76,14 +136,14 @@ function Profile() {
                   type="text"
                   placeholder="Enter Nickname"
                   value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
+                  onChange={handleNicknameChange}
                 />
                 <input
                   class="editbox"
                   type="text"
                   placeholder="Enter New Email"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
+                  value={email}
+                  onChange={handleEmailChange}
                 />
               </>
             ) : (

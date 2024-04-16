@@ -9,7 +9,7 @@ import { useAuth } from "../pages/Auth/AuthContext.js";
 
 function NavBar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isLoggedIn } = useAuth();
+  const { authUser } = useAuth();
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -21,17 +21,17 @@ function NavBar() {
 
   return (
     <div id="navBar">
-      {isLoggedIn && (
+      {authUser && (
         <Link to="/home">
           <img src={HomeIcon} alt="Home" id="homeButton" />
         </Link>
       )}
 
-      <Link to={isLoggedIn ? "/home" : "/"}>
+      <Link to={authUser ? "/home" : "/"}>
         <span id="navBarTitle">BLOKUS</span>
       </Link>
 
-      {isLoggedIn && (
+      {authUser && (
         <img src={HelpIcon} alt="Help" id="helpButton" onClick={openModal} />
       )}
 
