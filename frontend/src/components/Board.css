@@ -5,6 +5,26 @@
     align-items: center;
 }
 
+#lobbyHolder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#lobbyTxt {
+    margin-bottom: 600px;
+    color: rgb(163, 163, 163);
+    font-size: 25px;
+    width: 100vw;
+    text-align: center;
+    font-family: "Jockey One", sans-serif;
+}
+
 #timerHolder {
     position: absolute;
     top: 0;

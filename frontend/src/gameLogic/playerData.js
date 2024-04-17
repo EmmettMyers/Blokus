@@ -1,11 +1,13 @@
-import { reset_pieces, pieces_blocks_counts, total_blocks_for_player } from "./pieceData";
-
 export let players = ['blue', 'red', 'yellow', 'green'];
 
 export let bots_playing = ['', '', '', ''];
 
 // index of which player's turn it is (ex: index 0 = yellow turn)
 export let currentPlayerTurnIndex = 0;
+
+export function set_turn_index(value) {
+    currentPlayerTurnIndex = value;
+}
 
 export function reset_player_data(){
     currentPlayerTurnIndex = 0;
@@ -30,32 +32,45 @@ export function end_turn(){
     } else {
         currentPlayerTurnIndex++;
     }
-    console.log("new player -> " + players[currentPlayerTurnIndex] + ": " + can_play[players[currentPlayerTurnIndex]] + ", " + playable_pieces[players[currentPlayerTurnIndex]])
+    //console.log("new player -> " + players[currentPlayerTurnIndex] + ": " + can_play[players[currentPlayerTurnIndex]] + ", " + playable_pieces[players[currentPlayerTurnIndex]])
     // if new player can't play, then end turn again
     if (!can_play[players[currentPlayerTurnIndex]]){
-        console.log("end_turn recurse")
+        //console.log("end_turn recurse")
         end_turn();
     } else {
-        console.log("end_turn reset pieces call")
-        reset_pieces();
+        return currentPlayerTurnIndex;
     }
 }
 
-export function determine_winner(){
-    let winner = { player: '', score: total_blocks_for_player + 1 };
+export function determine_winner(player_pieces, total_blocks_for_player, pieces_blocks_counts){
+    let winner = { player: '', score: (total_blocks_for_player + 1)*(-1) };
+    let tied = false;
     players.forEach((player) => {
+        let total_placed = 0;
         let score = 0;
         for (let i = 0; i < player_pieces[player].length; i++){
             if (player_pieces[player][i]){
                 let piece_size = pieces_blocks_counts[i];
-                score += piece_size;
+                total_placed += piece_size;
             }
         }
+        if (total_placed == 0) { //eventually change to == 89 once emmett fixes his stuff (or we can just leave if it doesn't affect other stuff)
+            score = 25;
+        }
+        else {
+            score = (89-total_placed) - 89; //eventually change to just total_placed-89 once emmett fixes his stuff (or we can just leave if it doesn't affect other stuff)
+        }
         console.log(player + " score: " + score)
-        if (score < winner.score)
+        if (score > winner.score) {
             winner = { player: player, score: score };
+            tied = false;
+        } else if (score === winner.score) {
+            tied = true;
+        }
     });
-    return winner.player;
+    if (tied)
+        return "tie";
+    return winner;
 }
 
 // there are 21 pieces, each has a set index; true means the player has the piece

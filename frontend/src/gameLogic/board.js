@@ -1,7 +1,12 @@
 import { players, player_pieces, playable_pieces, can_play, end_turn, determine_winner, reset_player_data, currentPlayerTurnIndex } from './playerData';
-import { pieces, reset_pieces, rotate_piece } from './pieceData';
+import { pieces, pieces_blocks_counts, reset_pieces, rotate_piece, total_blocks_for_player } from './pieceData';
+import { can_play_piece } from './checks';
 
 export let board_matrix = Array.from({ length: 20 }, () => Array(20).fill(''));
+
+export function set_board_matrix(matrix){
+    board_matrix = matrix;
+}
 
 export function reset_game(){
     board_matrix = Array.from({ length: 20 }, () => Array(20).fill(''));
@@ -47,7 +52,7 @@ export function play_random_piece(player, greedySize = false, greedyCorners = fa
                 for (let boardRow = 0; boardRow < board_matrix.length; boardRow++) {
                     for (let boardCol = 0; boardCol < board_matrix[boardRow].length; boardCol++) {
                         // check if a piece can be played at the spot, if so add to possible plays
-                        if (can_play_piece(boardRow, boardCol, piece_index, player)){
+                        if (can_play_piece(board_matrix, pieces[piece_index], boardRow, boardCol, player)){
                             let playable_corners = find_playable_corners(piece_index, boardRow, boardCol, player);
                             possible_piece_plays.push([boardRow, boardCol, rotation, playable_corners]);
                         }
@@ -106,7 +111,7 @@ function find_playable_corners(piece_index, boardRow, boardCol, player){
                 for (let row = 0; row < board_matrix.length; row++) {
                     for (let col = 0; col < board_matrix[row].length; col++) {
                         // check if a piece can be played at the spot, if so add to playable corners tracker
-                        if (can_play_piece(row, col, test_piece_index, player)){
+                        if (can_play_piece(board_matrix, pieces[piece_index], row, col, player)){
                             playable_corners++;
                         }
                     }
@@ -127,12 +132,13 @@ function find_playable_corners(piece_index, boardRow, boardCol, player){
 // checks to do after every round
 function end_round_checks(){
     set_player_game_overs();
-    console.log("current player -> " + players[currentPlayerTurnIndex] + ": " + can_play[players[currentPlayerTurnIndex]] + ", " + playable_pieces[players[currentPlayerTurnIndex]])
+    //console.log("current player -> " + players[currentPlayerTurnIndex] + ": " + can_play[players[currentPlayerTurnIndex]] + ", " + playable_pieces[players[currentPlayerTurnIndex]])
     if (is_game_over()){
         console.log("game over");
-        console.log("winner: " + determine_winner());
+        console.log("winner: " + determine_winner(player_pieces, total_blocks_for_player, pieces_blocks_counts).player);
     } else {
         end_turn();
+        reset_pieces();
     }
 }
 
@@ -159,7 +165,7 @@ function set_player_game_overs() {
                     for (let row = 0; row < board_matrix.length; row++) {
                         for (let col = 0; col < board_matrix[row].length; col++) {
                             // which pieces can the player play, if any at all?
-                            if (player_pieces[player] && can_play_piece(row, col, piece_index, player)){
+                            if (player_pieces[player] && can_play_piece(board_matrix, pieces[piece_index], row, col, player)){
                                 player_can_play = true;
                                 piece_was_playable = true;
                             }
@@ -174,87 +180,4 @@ function set_player_game_overs() {
         // sets if the player can play any pieces
         can_play[player] = player_can_play;
     });
-}
-
-// checks if pieces can be played based on their piece index
-export function can_play_piece(boardRow, boardCol, piece_index, player){
-    let piece = pieces[piece_index];
-    let has_diagonals = false;
-    let on_board_edge = false;
-    let all_blocks_valid = true;
-    // loop through piece 2d array
-    for (let r = 0; r < piece.length; r++){
-        for (let c = 0; c < piece[r].length; c++ ){
-            // if current block isn't empty
-            if (piece[r][c] == 1){
-                if (!valid_block(boardRow + r, boardCol + c, player)){
-                    all_blocks_valid = false;
-                    break;
-                } else {
-                    if (diagonals_present(boardRow + r, boardCol + c, player)){
-                        has_diagonals = true;
-                    } else if (on_player_edge(boardRow + r, boardCol + c, player)){
-                        on_board_edge = true;
-                    }
-                }
-            }
-        }
-    }
-    if (all_blocks_valid && (has_diagonals || on_board_edge))
-        return true;
-    return false;
-}
-
-// check if the block is valid (fits within rule sets)
-function valid_block(r, c, player){
-    let not_past_walls = r >= 0 && r < board_matrix.length && c >= 0 && c < board_matrix[r].length;
-    if (not_past_walls) {
-        let block_empty = board_matrix[r][c] == '';
-        let not_touching_own_blocks = 
-            (r == board_matrix.length - 1 || board_matrix[r + 1][c] != player) && 
-            (r == 0 || board_matrix[r - 1][c] != player) && 
-            (c == board_matrix[0].length - 1 || board_matrix[r][c + 1] != player) && 
-            (c == 0 || board_matrix[r][c - 1] != player);
-        if (block_empty && not_touching_own_blocks)
-            return true;
-    }
-    return false;
-}
-
-// check if the block has diagonal touch with correct circumstances
-function diagonals_present(r, c, player){
-    let top_left = 
-        r > 0 && c > 0 && 
-        board_matrix[r - 1][c - 1] == player && 
-        board_matrix[r - 1][c] != player && 
-        board_matrix[r][c - 1] != player;
-    let bottom_left = 
-        r < board_matrix.length - 1 && c < board_matrix[0].length - 1 && 
-        board_matrix[r + 1][c + 1] == player && 
-        board_matrix[r + 1][c] != player && 
-        board_matrix[r][c + 1] != player;
-    let top_right = 
-        r > 0 && c < board_matrix[0].length - 1 && 
-        board_matrix[r - 1][c + 1] == player && 
-        board_matrix[r - 1][c] != player && 
-        board_matrix[r][c + 1] != player;
-    let bottom_right = 
-        r < board_matrix.length - 1 && c > 0 && 
-        board_matrix[r + 1][c - 1] == player && 
-        board_matrix[r + 1][c] != player && 
-        board_matrix[r][c - 1] != player;
-    if (top_left || bottom_left || top_right || bottom_right)
-        return true;
-    return false;
-}
-
-// check if the block is on the edge the player can play on
-function on_player_edge(r, c, player){
-    let blue_edge = player == 'blue' && r == 0 && c == 0;
-    let red_edge = player == 'red' && r == 0 && c == board_matrix.length - 1;
-    let green_edge = player == 'green' && r == board_matrix.length - 1 && c == board_matrix.length - 1;
-    let yellow_edge = player == 'yellow' && r == board_matrix.length - 1 && c == 0;
-    if (blue_edge || red_edge || green_edge || yellow_edge)
-        return true;
-    return false;
 }

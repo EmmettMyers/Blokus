@@ -1,28 +1,28 @@
 
-#c1Avatar, #c2Avatar, #c3Avatar, #c4Avatar, #blueAvatar, #redAvatar, #greenAvatar, #yellowAvatar {
+#avatar4, #avatar5, #avatar6, #avatar7, #avatar0, #avatar1, #avatar2, #avatar3 {
     width: 120px;
     height: 80px;
 }
 
-#c1Avatar, #c2Avatar, #c3Avatar, #c4Avatar {
+#avatar4, #avatar5, #avatar6, #avatar7 {
     cursor: pointer;
 }
 
-#blueAvatar {
+#avatar0 {
     filter: brightness(0) saturate(100%) invert(9%) sepia(97%) saturate(6331%) hue-rotate(247deg) brightness(99%) contrast(147%);
 }
-#redAvatar {
+#avatar2 {
     filter: brightness(0) saturate(100%) invert(21%) sepia(92%) saturate(5422%) hue-rotate(356deg) brightness(116%) contrast(134%);
 }
-#greenAvatar {
+#avatar3 {
     filter: brightness(0) saturate(100%) invert(29%) sepia(95%) saturate(1257%) hue-rotate(92deg) brightness(96%) contrast(107%);
 }
-#yellowAvatar {
+#avatar1 {
     filter: brightness(0) saturate(100%) invert(90%) sepia(9%) saturate(5449%) hue-rotate(327deg) brightness(104%) contrast(84%);
 }
 
 
-#c1BottomText, #c2BottomText, #c3BottomText, #c4BottomText  {
+#bottomText4, #bottomText5, #bottomText6, #bottomText7  {
     width: 120px;
     line-height: 0;
     color: #7B7B7B;
@@ -33,7 +33,7 @@
     cursor: pointer;
 }
 
-#blueBottomText, #redBottomText, #greenBottomText, #yellowBottomText {
+#bottomText0, #bottomText1, #bottomText2, #bottomText3 {
     width: 120px;
     line-height: 0;
     font-size: 20px;
@@ -41,26 +41,26 @@
     font-family: "Jockey One", sans-serif;
     color: white;
 }
-#blueBottomText {
+#bottomText0 {
     text-shadow: -1px -1px 0 #0000FF, 1px -1px 0 #0000FF, -1px 1px 0 #0000FF, 1px 1px 0 #0000FF;
 }
-#redBottomText {
+#bottomText2 {
     text-shadow: -1px -1px 0 #FF0000, 1px -1px 0 #FF0000, -1px 1px 0 #FF0000, 1px 1px 0 #FF0000;
 }
-#greenBottomText {
+#bottomText3 {
     text-shadow: -1px -1px 0 #008000, 1px -1px 0 #008000, -1px 1px 0 #008000, 1px 1px 0 #008000;
 }
-#yellowBottomText {
+#bottomText1 {
     text-shadow: -1px -1px 0 #EBB346, 1px -1px 0 #EBB346, -1px 1px 0 #EBB346, 1px 1px 0 #EBB346;
 }
 
-#blueContainer, #redContainer, #c1Container, #c3Container {
+#container0, #container2, #container4, #container6 {
     margin-bottom: 180px;
     position: relative;
     z-index: 2;
 }
 
-#greenContainer, #yellowContainer, #c2Container, #c4Container {
+#container1, #container3, #container5, #container7 {
     margin-top: 180px;
     position: relative;
     z-index: 2;
