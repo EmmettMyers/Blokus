@@ -46,13 +46,16 @@ function Profile() {
 
   const handleSave = async () => {
     try {
+      let emailUpdated = false;
+
       // only update the email if the user has changed something
-      if (isEmailDirty) {
+      if (isEmailDirty && email !== authUser.email) {
         await updateEmail(authUser, email);
-        await sendEmailVerification(authUser);
-        console.log("Hello?");
         setMessage("Email address updated successfully.");
         setEmail(email);
+        emailUpdated = true;
+
+        await sendEmailVerification(authUser);
       }
 
       // only update the nickname if the user has changed something
@@ -70,8 +73,9 @@ function Profile() {
           totalPieces: userData.totalPieces,
         };
         // actually update in the database
-        setDoc(docRef, payload);
+        await setDoc(docRef, payload);
       }
+
       setEditMode(false);
     } catch (error) {
       setMessage(error.message);
