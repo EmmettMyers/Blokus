@@ -15,9 +15,13 @@ function Profile() {
   const { authUser, setAuthUser } = useAuth();
   const [userData, setUserData] = useState("");
   const [nickname, setNickname] = useState("Loading ...");
+  const [firstname, setFirstname] = useState("Loading ...");
+  const [lastname, setLastname] = useState("Loading ...");
   const [email, setEmail] = useState("Loading ...");
   const [editMode, setEditMode] = useState(false);
   const [isNicknameDirty, setIsNicknameDirty] = useState(false);
+  const [isFirstnameDirty, setIsFirstnameDirty] = useState(false);
+  const [isLastnameDirty, setIsLastnameDirty] = useState(false);
   const [isEmailDirty, setIsEmailDirty] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -37,6 +41,16 @@ function Profile() {
   const handleNicknameChange = (e) => {
     setNickname(e.target.value);
     setIsNicknameDirty(true);
+  };
+
+  const handleFirstnameChange = (e) => {
+    setFirstname(e.target.value);
+    setIsFirstnameDirty(true);
+  };
+
+  const handleLastnameChange = (e) => {
+    setLastname(e.target.value);
+    setIsLastnameDirty(true);
   };
 
   const handleEmailChange = (e) => {
@@ -67,6 +81,40 @@ function Profile() {
           nickname: nickname,
           firstName: userData.firstName,
           lastName: userData.lastName,
+          profileImage: userData.profileImage,
+          gamesPlayed: userData.gamesPlayed,
+          gamesWon: userData.gamesWon,
+          totalPieces: userData.totalPieces,
+        };
+        // actually update in the database
+        await setDoc(docRef, payload);
+      }
+
+      if (isFirstnameDirty) {
+        // identify the user info we want to change
+        const docRef = doc(database, "users", authUser.uid);
+        // set the fields we want to change
+        const payload = {
+          nickname: userData.nickname,
+          firstName: firstname,
+          lastName: userData.lastName,
+          profileImage: userData.profileImage,
+          gamesPlayed: userData.gamesPlayed,
+          gamesWon: userData.gamesWon,
+          totalPieces: userData.totalPieces,
+        };
+        // actually update in the database
+        await setDoc(docRef, payload);
+      }
+
+      if (isLastnameDirty) {
+        // identify the user info we want to change
+        const docRef = doc(database, "users", authUser.uid);
+        // set the fields we want to change
+        const payload = {
+          nickname: userData.nickname,
+          firstName: userData.firstName,
+          lastName: lastname,
           profileImage: userData.profileImage,
           gamesPlayed: userData.gamesPlayed,
           gamesWon: userData.gamesWon,
@@ -107,6 +155,10 @@ function Profile() {
 
           // get the email from firebase auth and set it in the frontend state
           setEmail(authUser.email);
+
+          // get first and last names and set them in the frontend state
+          setFirstname(userData.firstName);
+          setLastname(userData.lastName);
         } else {
           console.log("User document does not exist");
         }
@@ -130,7 +182,8 @@ function Profile() {
           <div id="infotext">
             <div class="infobox">Nickname:</div>
             <div class="infobox">Email:</div>
-            {/* <div class="infobox">Password:</div> */}
+            <div class="infobox">First Name:</div>
+            <div class="infobox">Last Name:</div>
           </div>
           <div id="inputtext">
             {editMode ? (
@@ -149,26 +202,42 @@ function Profile() {
                   value={email}
                   onChange={handleEmailChange}
                 />
+                <input
+                  class="editbox"
+                  type="text"
+                  placeholder="Enter First Name"
+                  value={firstname}
+                  onChange={handleFirstnameChange}
+                />
+                <input
+                  class="editbox"
+                  type="text"
+                  placeholder="Enter Last Name"
+                  value={lastname}
+                  onChange={handleLastnameChange}
+                />
               </>
             ) : (
               <>
                 <div className="textbox">{nickname}</div>
                 <div className="textbox">{email}</div>
+                <div className="textbox">{firstname}</div>
+                <div className="textbox">{lastname}</div>
               </>
             )}
           </div>
         </div>
       </div>
       <div id="profilebuttonscontainer">
-        <button
+        <div
           id="editprofilebutton"
           onClick={editMode ? handleSave : handleEdit}
         >
           {editMode ? "Save" : "Edit"}
-        </button>
-        <button id="logoutbutton" onClick={handleSignOut}>
+        </div>
+        <div id="logoutbutton" onClick={handleSignOut}>
           Log Out
-        </button>
+        </div>
       </div>
       <button id="cpbutton" onClick={handleResetPassword}>
         Change Password

@@ -52,9 +52,9 @@ function Login() {
           </div>
         </div>
       </div>
-      <button id="loginbutton" type="submit">
+      <div id="loginbutton" type="submit">
         Log In
-      </button>
+      </div>
       <span id="rusignupmessage">
         Don't have an account?{" "}
         <Link id="rusignuplink" to={"/signup"}>
